@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments (highly recommended)
+venv/
+.venv/
+env/
+bin/
+lib/
+
+# Notebooks and temporary files
+.ipynb_checkpoints
+.DS_Store
+
+# Hugging Face & Model Weights
+# (Prevents uploading huge model files to GitHub)
+models/
+hub/
+*.bin
+*.pt
+*.pth
+
+# Environment variables (Sensitive info)
+.env
