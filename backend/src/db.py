@@ -20,7 +20,7 @@ def get_connection(setup=False):
     register_vector(conn)
     return conn
 
-def init_db():
+def init_db(reset: bool = False):
     """Requirement 3 & 4: Create schema and IVF Flat index."""
     conn = get_connection(setup=True)
     try:
@@ -35,6 +35,10 @@ def init_db():
                     embedding VECTOR({EMBEDDING_DIM})
                 );
             """)
+            
+            if reset:
+                cur.execute("TRUNCATE TABLE document_vectors RESTART IDENTITY;")
+                
         conn.commit()
     finally:
         conn.close()
