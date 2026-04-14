@@ -1,6 +1,8 @@
 from google import genai
+from langsmith import traceable
 from src.config import GEMINI_API_KEY
 
+@traceable(name="LLM RAG Generation (Gemini)")
 def generate_rag_response(query: str, contexts: list[dict]) -> str:
     """
     Takes the user query and the retrieved database chunks

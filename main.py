@@ -1,14 +1,20 @@
 import os
+import sys
 import time
-from src.db import init_db, batch_insert_embeddings
-from src.ingest import parse_pdf_parallel, chunk_documents
-from src.embedding import get_embeddings
-from src.retrieve import retrieve_similar_chunks
+import asyncio
 
-def run_ingestion(pdf_path: str):
+# Correct imports for root directory execution mappings into the backend microservice
+sys.path.append(os.path.join(os.path.dirname(__file__), "backend"))
+
+from backend.src.db import init_db, batch_insert_embeddings
+from backend.src.ingest import parse_pdf_parallel, chunk_documents
+from backend.src.embedding import get_embeddings
+from backend.src.retrieve import retrieve_similar_chunks
+
+async def run_ingestion(pdf_path: str):
     """Orchestrates the entire ingestion and indexing pipeline."""
     print("=== Step 1: Initializing Database Schema & IVF Flat Index ===")
-    init_db()
+    await init_db()
     
     print(f"\n=== Step 2: Parallel PDF Parsing ({pdf_path}) ===")
     start_time = time.time()
@@ -29,13 +35,13 @@ def run_ingestion(pdf_path: str):
     
     print("\n=== Step 5: Batch Inserting to PGVector ===")
     start_time = time.time()
-    batch_insert_embeddings(contents, embeddings, metadatas)
+    await batch_insert_embeddings(contents, embeddings, metadatas)
     print(f"Insertion took {time.time() - start_time:.2f} seconds.")
 
-def run_retrieval(query: str):
+async def run_retrieval(query: str):
     print(f"\n=== Retrieving Context for: '{query}' ===")
     start_time = time.time()
-    results = retrieve_similar_chunks(query, top_k=5)
+    results = await retrieve_similar_chunks(query, top_k=5)
     print(f"Retrieval took {time.time() - start_time:.4f} seconds.")
     
     for i, res in enumerate(results, 1):
@@ -48,7 +54,7 @@ def run_retrieval(query: str):
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description="High-Speed RAG Pipeline")
+    parser = argparse.ArgumentParser(description="High-Speed RAG Pipeline (Async Migrated)")
     parser.add_argument("--mode", choices=["ingest", "query"], required=True)
     parser.add_argument("--pdf", type=str, help="Path to PDF (Required for ingest)")
     parser.add_argument("--query", type=str, help="Query string (Required for search)")
@@ -59,9 +65,9 @@ if __name__ == "__main__":
         if not args.pdf:
             print("Error: --pdf path is required for ingestion.")
         else:
-            run_ingestion(args.pdf)
+            asyncio.run(run_ingestion(args.pdf))
     elif args.mode == "query":
         if not args.query:
             print("Error: --query string is required for retrieval.")
         else:
-            run_retrieval(args.query)
+            asyncio.run(run_retrieval(args.query))

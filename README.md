@@ -27,7 +27,7 @@ Open `.env` and paste your actual key: `GEMINI_API_KEY=your_key_here`
 ### 2. Launch the Application
 Start the entire stack (Database, Backend API, and Frontend) with a single command:
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 ### 3. Access the Interfaces
